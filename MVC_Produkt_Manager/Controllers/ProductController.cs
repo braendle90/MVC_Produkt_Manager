@@ -21,16 +21,37 @@ namespace MVC_Produkt_Manager.Controllers
         }
 
         // GET: Product
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int index)
         {
 
             var products = await _context.Products
                 .Include(x => x.Category)
                 .ToListAsync();
 
-            return View(products);
+            var fiveProducts = products.GetRange(0,5);
+
+            return View(fiveProducts);
         }
 
+        [HttpGet]
+        [ActionName("IndexRange")]
+        public async Task<IActionResult> IndexRange(int item, int index )
+        {
+            
+
+            int indexFrom = 0;
+            int indexTo = index * 25;
+
+
+            var products = await _context.Products
+              .Include(x => x.Category)
+              .ToListAsync();
+
+            var fiveProducts = products.GetRange(indexFrom, indexTo);
+
+            return View("Index",fiveProducts);
+
+        }
         // GET: Product/Details/5
         public async Task<IActionResult> Details(int? id)
         {
