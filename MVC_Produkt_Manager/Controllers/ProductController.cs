@@ -21,37 +21,52 @@ namespace MVC_Produkt_Manager.Controllers
         }
 
         // GET: Product
-        public async Task<IActionResult> Index(int index)
+        public async Task<IActionResult> Index(string search, string pageSizeA, int pg=1)
         {
 
-            var products = await _context.Products
-                .Include(x => x.Category)
-                .ToListAsync();
+            if (pageSizeA == null)
+            {
+                pageSizeA = "10";
+            }
 
-            var fiveProducts = products.GetRange(0,5);
+             int pageSize = int.Parse(pageSizeA);
+            if (pg <1)
+            {
+                pg = 1;
+            }
 
-            return View(fiveProducts);
-        }
+            if (search != null)
+            {
+    
+                var product = _context.Products.Where(x => x.ProductName.Contains(search) || x.Description.Contains(search) );
+                var searchedProducts = await product.ToListAsync();
+                int resCount = searchedProducts.Count();
+                var pagination = new Pagination(resCount, pg, pageSize);
+                int recSkip = (pg - 1) * pageSize;
+                var model = searchedProducts.Skip(recSkip).Take(pagination.PageSize).ToList();
+                this.ViewBag.Pagination = pagination;
+               
+                return View(model);
 
-        [HttpGet]
-        [ActionName("IndexRange")]
-        public async Task<IActionResult> IndexRange(int item, int index )
-        {
+            }
+            else { 
+
+
+            var allProducts = await _context.Products.ToListAsync();
+            int recsCount = allProducts.Count();
+            var pagination = new Pagination(recsCount,pg,pageSize);
+            var recSkip = (pg - 1) * pageSize;
+            var model = allProducts.Skip(recSkip).Take(pagination.PageSize).ToList();
+            this.ViewBag.Pagination = pagination;
             
 
-            int indexFrom = 0;
-            int indexTo = index * 25;
 
+                return View(model);
 
-            var products = await _context.Products
-              .Include(x => x.Category)
-              .ToListAsync();
-
-            var fiveProducts = products.GetRange(indexFrom, indexTo);
-
-            return View("Index",fiveProducts);
-
+            }
         }
+
+   
         // GET: Product/Details/5
         public async Task<IActionResult> Details(int? id)
         {

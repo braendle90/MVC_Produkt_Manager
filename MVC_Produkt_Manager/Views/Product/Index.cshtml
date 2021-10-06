@@ -1,25 +1,64 @@
 ﻿@model IEnumerable<MVC_Produkt_Manager.Models.Product>
-
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor _httpContextAccessor
 @{
+    string pageSizeA = _httpContextAccessor.HttpContext.Request.Query["pageSizeA"].ToString();
+    string search = _httpContextAccessor.HttpContext.Request.Query["search"].ToString();
+
+
     ViewData["Title"] = "Index";
+
+
+
+    Pagination pagination = new Pagination();
+    int pageNr = 0;
+    if (ViewBag.Pagination != null)
+    {
+        pagination = ViewBag.Pagination;
+        pageNr = pagination.CurrentPage;
+    }
+
+
+    IEnumerable<string> listTest = new List<string> { "10", "25", "30" };
+
 }
 
+<form method="get" >
+    <div class="col-md-10">
+
+
+        @Html.DropDownList("pageSizeA", new List<SelectListItem>
+                {
+                   new SelectListItem{ Text="12", Value = "13" },
+                   new SelectListItem{ Text="25", Value = "25" },
+                  new SelectListItem{ Text="50", Value = "50" },
+                },
+                new { @onchange = "this.form.submit();"}
+                )
+
+    </div>
+</form>
+
+
+
+@*@Html.DropDownListFor(model => model., (SelectList)ViewData["Student"], new { @onchange = "this.form.submit();" })*@
+
 <h1>Index</h1>
+
+<form asp-route-pageSizeA="@pageSizeA" asp-route-search="@search" method="get">
+
+
+    <input type="text" name="pageSizeA"value="@pageSizeA" />
+    <input type="text" name="search" class="input" placeholder="Suche... Produkt" />
+    <input asp-route-pageSizeA="@pageSizeA" asp-route-search="@search" type="submit" class="btn btn-secondary" />
+
+</form>
 
 <p>
     <a asp-action="Create">Create New</a>
 </p>
 
-<form asp-controller="Product" asp-action="IndexRange">
+<form method="get">
 
-    <label for="cars">Choose items:</label>
-    <select name="item" id="item">
-        <option asp-action="IndexRange" asp-route-item="9" value="1">10</option>
-
-        <option asp-route-item="33" name="item" value="2">25</option>
-        <option asp-route-item="22" name="item" value="3">50</option>
-        <option asp-route-item="11" name="item" value="4">75</option>
-    </select>
 
     <table class="table">
         <thead>
@@ -107,38 +146,20 @@
 
 
         </tbody>
+
     </table>
-    </form>
-
-
-    <div id="pagination">
-
-
-        <nav aria-label="Page navigation example">
-            <ul class="pagination justify-content-center">
-                <li class="page-item disabled">
-                    <a class="page-link" href="#" tabindex="-1">Previous</a>
-                </li>
-                <li class="page-item"><a asp-action="IndexRange" asp-route-index="0" class="page-link">1</a></li>
-                <li class="page-item"><a asp-action="IndexRange" asp-route-index="1" class="page-link">2</a></li>
-                <li class="page-item"><a asp-action="IndexRange" asp-route-index="2" class="page-link">3</a></li>
-                <li class="page-item">
-                    <a class="page-link" href="#">Next</a>
-                </li>
-            </ul>
-        </nav>
-
-
-
-    </div>
 
 
 
 
+</form>
+
+<partial name="_PaginationPartial" model="@pagination" />
 
 
-    @section Scripts {
-        <script>
+
+@section Scripts {
+    <script>
 
         function ajaxModal(id) {
 
@@ -166,8 +187,8 @@
         }
 
 
-        </script>
-    }
+    </script>
+}
 
 
 
