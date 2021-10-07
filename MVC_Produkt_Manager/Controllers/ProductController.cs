@@ -52,6 +52,9 @@ namespace MVC_Produkt_Manager.Controllers
             else { 
 
 
+                    
+
+
             var allProducts = await _context.Products.ToListAsync();
             int recsCount = allProducts.Count();
             var pagination = new Pagination(recsCount,pg,pageSize);
@@ -86,15 +89,35 @@ namespace MVC_Produkt_Manager.Controllers
         }
 
         // GET: Product/Create
-        public async Task<IActionResult> Create()
+        public async Task<IActionResult> Create(int? id)
         {
 
-            var category = await _context.Categorie.ToListAsync();
+
             var viewModel = new ProductCategoryViewModel();
             viewModel.CategoryList = new List<Category>();
-            foreach (var item in category)
+
+
+            if (id != null)
             {
-                viewModel.CategoryList.Add(item);
+                var categoryId = await _context.Categorie.FindAsync(id);
+                viewModel.CategoryList.Add(categoryId);
+                var category = await _context.Categorie.ToListAsync();
+                category.Remove(categoryId);
+                foreach (var item in category)
+                {
+                    viewModel.CategoryList.Add(item);
+                }
+
+
+            }
+            else
+            {
+                var category = await _context.Categorie.ToListAsync();
+
+                foreach (var item in category)
+                {
+                    viewModel.CategoryList.Add(item);
+                }
             }
 
             return View(viewModel);
@@ -228,5 +251,9 @@ namespace MVC_Produkt_Manager.Controllers
 
             return Ok(modal);
         }
+
+
+        
+
     }
 }

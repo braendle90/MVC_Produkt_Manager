@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using MVC_Produkt_Manager.Models;
 using Microsoft.AspNetCore.Http;
 using System.IO;
+using System.Diagnostics;
 
 namespace MVC_Produkt_Manager.Controllers
 {
@@ -106,12 +107,7 @@ namespace MVC_Produkt_Manager.Controllers
         public async Task<IActionResult> EditConfirmed(IFormFile image,int id,[Bind("Id,CategoryName,Description,Image")] Category category)
         {
 
-            var testImage = image;
-
-
-            // Tbl_News tbl_News = new Tbl_News();
-
-
+       
 
 
             if (id != category.Id)
@@ -134,6 +130,9 @@ namespace MVC_Produkt_Manager.Controllers
                     {
                         image.CopyTo(stream);
                     }
+
+
+
 
 
                     category.Image = ImageName;
@@ -179,6 +178,28 @@ namespace MVC_Produkt_Manager.Controllers
             return View(category);
         }
 
+        public async Task<IActionResult> ListOfProducts (int id, int pg=1)
+        {
+            const int pageSize = 6;
+            if (pg <1)
+            {
+                pg = 1;
+            }
+
+            var products = await _context.Products.Where(x => x.Category.Id == id).ToListAsync();
+            int resCount = products.Count();
+            var pagination = new Pagination(resCount, pg, pageSize);
+            int recSkip = (pg - 1) * pageSize;
+            var model = products.Skip(recSkip).Take(pagination.PageSize).ToList();
+            this.ViewBag.Pagination = pagination;
+
+
+
+
+
+            return View(model);
+
+        } 
 
     }
 }

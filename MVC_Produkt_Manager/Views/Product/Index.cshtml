@@ -22,22 +22,6 @@
 
 }
 
-<form method="get" >
-    <div class="col-md-10">
-
-
-        @Html.DropDownList("pageSizeA", new List<SelectListItem>
-                {
-                   new SelectListItem{ Text="12", Value = "13" },
-                   new SelectListItem{ Text="25", Value = "25" },
-                  new SelectListItem{ Text="50", Value = "50" },
-                },
-                new { @onchange = "this.form.submit();"}
-                )
-
-    </div>
-</form>
-
 
 
 @*@Html.DropDownListFor(model => model., (SelectList)ViewData["Student"], new { @onchange = "this.form.submit();" })*@
@@ -46,10 +30,24 @@
 
 <form asp-route-pageSizeA="@pageSizeA" asp-route-search="@search" method="get">
 
+    <div class="col-md-10">
 
-    <input type="text" name="pageSizeA"value="@pageSizeA" />
-    <input type="text" name="search" class="input" placeholder="Suche... Produkt" />
-    <input asp-route-pageSizeA="@pageSizeA" asp-route-search="@search" type="submit" class="btn btn-secondary" />
+
+        @Html.DropDownList("pageSizeA", new List<SelectListItem>
+        {
+          new SelectListItem{ Text="10", Value = "10" },
+           new SelectListItem{ Text="25", Value = "25" },
+          new SelectListItem{ Text="50", Value = "50" },
+        },
+        new { @onchange = "this.form.submit();" }
+        )
+
+
+
+    </div>
+
+    <input type="text" name="search" class="input" value="@search" placeholder="Suche... Produkt" />
+    <input type="submit" class="btn btn-secondary" />
 
 </form>
 
@@ -160,6 +158,15 @@
 
 @section Scripts {
     <script>
+
+
+        function searchSubmit() {
+
+            document.getElementById("name").value()
+
+
+
+        }
 
         function ajaxModal(id) {
 
