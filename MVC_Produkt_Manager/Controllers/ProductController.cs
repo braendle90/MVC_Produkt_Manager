@@ -21,19 +21,23 @@ namespace MVC_Produkt_Manager.Controllers
         }
 
         // GET: Product
-        public async Task<IActionResult> Index(string search, string pageSizeA, int pg=1)
+        public async Task<IActionResult> Index(string search, int? pageSizeA, int pg=1)
         {
 
-            if (pageSizeA == null)
+            if (!pageSizeA.HasValue)
             {
-                pageSizeA = "10";
+                pageSizeA = 10;
             }
 
-             int pageSize = int.Parse(pageSizeA);
             if (pg <1)
             {
                 pg = 1;
             }
+
+            Pagination pagination = null;
+
+            IEnumerable<Product> model = null;
+
 
             if (search != null)
             {
@@ -41,32 +45,34 @@ namespace MVC_Produkt_Manager.Controllers
                 var product = _context.Products.Where(x => x.ProductName.Contains(search) || x.Description.Contains(search) );
                 var searchedProducts = await product.ToListAsync();
                 int resCount = searchedProducts.Count();
-                var pagination = new Pagination(resCount, pg, pageSize);
-                int recSkip = (pg - 1) * pageSize;
-                var model = searchedProducts.Skip(recSkip).Take(pagination.PageSize).ToList();
-                this.ViewBag.Pagination = pagination;
-               
-                return View(model);
+                pagination = new Pagination(resCount, pg, pageSizeA.Value);
+                int recSkip = (pg - 1) * pageSizeA.Value;
+                model = searchedProducts.Skip(recSkip).Take(pagination.PageSize).ToList();
+                
 
             }
             else { 
 
-
-                    
-
-
-            var allProducts = await _context.Products.ToListAsync();
-            int recsCount = allProducts.Count();
-            var pagination = new Pagination(recsCount,pg,pageSize);
-            var recSkip = (pg - 1) * pageSize;
-            var model = allProducts.Skip(recSkip).Take(pagination.PageSize).ToList();
-            this.ViewBag.Pagination = pagination;
-            
-
-
-                return View(model);
-
+            var AllProducts = await _context.Products.ToListAsync();
+                int resCount = AllProducts.Count();
+                pagination = new Pagination(resCount, pg, pageSizeA.Value);
+                int recSkip = (pg - 1) * pageSizeA.Value;
+                model = AllProducts.Skip(recSkip).Take(pagination.PageSize).ToList();
             }
+
+
+            var pro = new ProductViewModel
+            {
+                Products = model,
+                Page = pg,
+                PageSize = pageSizeA.Value,
+                Search = search,
+                Pagination = pagination
+            };
+
+            return View(pro);
+
+
         }
 
    
